@@ -102,7 +102,6 @@ function Ship({ id, src, alt, style, table, setTable, sqWidth, setGlobalDrag, va
 						if(validPlacement){
 							for (let i = 0; i < squareLength; i++) {
 								found = true;
-								document.getElementById(parseInt(element.id) + i * 10).style.backgroundColor = 'lightblue';
 								setTable(prevTable => {
 									const newTable = prevTable.map(row => [...row]);
 									newTable[parseInt(element.id / 10) + i][parseInt(element.id % 10)] = true;
