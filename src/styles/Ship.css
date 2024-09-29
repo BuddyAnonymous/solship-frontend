@@ -1,0 +1,26 @@
+.ship img {
+    border: 2px solid black;
+    height: 100%;
+    cursor: grab;
+    width: 100%;
+    z-index: 0;
+  }
+  
+  .ship {
+    display: flex;
+    z-index: -1;
+    margin-bottom: 10px;
+    position: absolute; /* Ensure ships can be positioned absolutely */
+  }
+  .vert{
+    display: flex;
+    flex-direction: column;
+    z-index: -1;
+    margin-bottom: 10px;
+    position: absolute; /* Ensure ships can be positioned absolutely */
+  }
+  .vert img{
+    border: 2px solid black;
+    cursor: grab;
+    z-index: 0;
+  }

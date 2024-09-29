@@ -1,0 +1,86 @@
+.build-board-container {
+  display: flex;
+  align-items: flex-start; /* Aligns the sidebar and board at the top */
+  padding: 20px;
+}
+
+.sidebar {
+  z-index: 1000;
+  display: flex;
+  flex-direction: column; /* Ensures ships stack vertically */
+  margin-right: 70px; /* Adds space between the ships and the board */
+  align-items: flex-end;
+  width: 250px;
+}
+
+.board-and-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ready-button {
+  margin-top: 20px;
+  background-color: #ff6161;
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 10px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.not-ready-button {
+  margin-top: 20px;
+  background-color: #f2bebe;
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 10px;
+  font-size: 1.5rem;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.ready-button:hover {
+  background-color: #ff4040;
+}
+
+.game-container {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 50px;
+  height: 100vh;
+}
+
+.board-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.attack-button {
+  background-color: #ff4040;
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 10px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: transform 0.1s, background-color 0.1s;
+}
+
+.attack-button-locked {
+  background-color: #f2bebe;
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 10px;
+  font-size: 1.5rem;
+}
+
+.attack-button:hover {
+  background-color: #862323;
+  transform: scale(1.2); /* Scale the button up by 20% */
+}

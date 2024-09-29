@@ -1,0 +1,43 @@
+.board {
+    display: grid;
+    grid-template-columns: repeat(10, 50px);
+    grid-template-rows: repeat(10, 50px);
+    gap: 0;
+    background-color: #1e90ff;
+    border: 3px solid rgb(0, 0, 0);
+    position: relative; /* Ensure the board is the reference for absolute positioning */
+  }
+  
+.board-square {
+  width: 50px;
+  height: 50px;
+  background-color: #8d98a1;
+  border: 1px solid rgb(0, 0, 0);
+}
+
+.board-square-dragging {
+  width: 50px;
+  height: 50px;
+  background-color: #1eeb3d;
+  border: 1px solid rgb(0, 0, 0);
+}
+
+.board-square-placed {
+  width: 50px;
+  height: 50px;
+  background-color: lightblue;
+  border: 1px solid rgb(0, 0, 0);
+}
+
+.board-square-invalid {
+  width: 50px;
+  height: 50px;
+  background-color: #ee3535;
+  border: 1px solid rgb(0, 0, 0);
+}
+
+.ship-image{
+  height: 50px;
+  width: 50px;
+}
+

@@ -1,0 +1,44 @@
+*{
+  user-select: none;
+  -webkit-user-drag: none;  /* For Safari/Chrome */
+  box-sizing: border-box;
+}
+/* General App Styling */
+.App {
+  text-align: center;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #1c1c34, #4f4fa1);
+}
+
+/* Landing Page Styling */
+.landing-page {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.title {
+  font-size: 4rem;
+  color: white;
+  margin-bottom: 20px;
+  font-family: 'Arial Black', sans-serif;
+}
+
+.play-button {
+  background-color: #ff6161;
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 10px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.play-button:hover {
+  background-color: #ff4040;
+}
