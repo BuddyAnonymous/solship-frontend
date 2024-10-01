@@ -42,3 +42,9 @@
 .play-button:hover {
   background-color: #ff4040;
 }
+
+.wallet-button-container {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+}

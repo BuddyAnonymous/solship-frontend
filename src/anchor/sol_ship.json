@@ -1,0 +1,698 @@
+{
+  "address": "6ePThmE1BtfXSoxnxCXKx3xdGrmJmbbXu9Pk347KjJLu",
+  "metadata": {
+    "name": "sol_ship",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "attack",
+      "discriminator": [
+        197,
+        26,
+        63,
+        242,
+        77,
+        247,
+        101,
+        119
+      ],
+      "accounts": [
+        {
+          "name": "player",
+          "signer": true
+        },
+        {
+          "name": "game"
+        }
+      ],
+      "args": [
+        {
+          "name": "field_to_attack",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "claim_win",
+      "discriminator": [
+        163,
+        215,
+        101,
+        246,
+        25,
+        134,
+        110,
+        194
+      ],
+      "accounts": [
+        {
+          "name": "player",
+          "signer": true
+        },
+        {
+          "name": "game"
+        }
+      ],
+      "args": [
+        {
+          "name": "table",
+          "type": {
+            "array": [
+              {
+                "defined": {
+                  "name": "ProofField"
+                }
+              },
+              128
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "create_game",
+      "discriminator": [
+        124,
+        69,
+        75,
+        66,
+        184,
+        220,
+        72,
+        206
+      ],
+      "accounts": [
+        {
+          "name": "game",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  103,
+                  97,
+                  109,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "player"
+              },
+              {
+                "kind": "arg",
+                "path": "enemy"
+              }
+            ]
+          }
+        },
+        {
+          "name": "player",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "queue",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  113,
+                  117,
+                  101,
+                  117,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "enemy",
+          "type": "pubkey"
+        },
+        {
+          "name": "board_root",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "initialize_queue",
+      "discriminator": [
+        174,
+        102,
+        132,
+        232,
+        90,
+        202,
+        27,
+        20
+      ],
+      "accounts": [
+        {
+          "name": "queue",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  113,
+                  117,
+                  101,
+                  117,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "user",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "join_queue",
+      "discriminator": [
+        157,
+        115,
+        48,
+        109,
+        65,
+        86,
+        203,
+        238
+      ],
+      "accounts": [
+        {
+          "name": "queue",
+          "writable": true
+        },
+        {
+          "name": "player",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "board_root",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "verify_proof",
+      "discriminator": [
+        217,
+        211,
+        191,
+        110,
+        144,
+        13,
+        186,
+        98
+      ],
+      "accounts": [
+        {
+          "name": "player",
+          "signer": true
+        },
+        {
+          "name": "game"
+        }
+      ],
+      "args": [
+        {
+          "name": "proof",
+          "type": {
+            "vec": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        },
+        {
+          "name": "leaf",
+          "type": {
+            "defined": {
+              "name": "GameField"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Game",
+      "discriminator": [
+        27,
+        90,
+        166,
+        125,
+        74,
+        100,
+        121,
+        18
+      ]
+    },
+    {
+      "name": "Queue",
+      "discriminator": [
+        204,
+        167,
+        6,
+        247,
+        20,
+        33,
+        2,
+        188
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "FieldAttacked",
+      "discriminator": [
+        65,
+        91,
+        146,
+        86,
+        9,
+        221,
+        13,
+        178
+      ]
+    },
+    {
+      "name": "GameFinished",
+      "discriminator": [
+        0,
+        128,
+        235,
+        237,
+        115,
+        180,
+        62,
+        221
+      ]
+    },
+    {
+      "name": "GameStarted",
+      "discriminator": [
+        222,
+        247,
+        78,
+        255,
+        61,
+        184,
+        156,
+        41
+      ]
+    },
+    {
+      "name": "ProofVerified",
+      "discriminator": [
+        181,
+        54,
+        148,
+        211,
+        237,
+        73,
+        131,
+        232
+      ]
+    },
+    {
+      "name": "TurnFinished",
+      "discriminator": [
+        17,
+        147,
+        233,
+        65,
+        51,
+        20,
+        246,
+        60
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "PlayerNotPartOfGame",
+      "msg": "Player is not part of the game"
+    },
+    {
+      "code": 6001,
+      "name": "WrongProvingFieldIndex",
+      "msg": "Wrong proving field index"
+    },
+    {
+      "code": 6002,
+      "name": "InvalidProof",
+      "msg": "Invalid proof"
+    },
+    {
+      "code": 6003,
+      "name": "AlreadyTriedVerifing",
+      "msg": "Player already tried verifing this turn"
+    },
+    {
+      "code": 6004,
+      "name": "TurnNotExpired",
+      "msg": "Turn duration has not expired"
+    },
+    {
+      "code": 6005,
+      "name": "InvalidTable",
+      "msg": "Invalid table"
+    },
+    {
+      "code": 6006,
+      "name": "TimeExpired",
+      "msg": "Time expired"
+    },
+    {
+      "code": 6007,
+      "name": "GameFinished",
+      "msg": "Game finished"
+    },
+    {
+      "code": 6008,
+      "name": "EnemyPlayedTurn",
+      "msg": "Enemy played turn"
+    }
+  ],
+  "types": [
+    {
+      "name": "FieldAttacked",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "game",
+            "type": "pubkey"
+          },
+          {
+            "name": "player",
+            "type": "pubkey"
+          },
+          {
+            "name": "attacked_field",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Game",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "player1",
+            "type": "pubkey"
+          },
+          {
+            "name": "player2",
+            "type": "pubkey"
+          },
+          {
+            "name": "player1_board_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "player2_board_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "current_turn",
+            "type": "u8"
+          },
+          {
+            "name": "player1_attacked_fields",
+            "type": {
+              "array": [
+                "bool",
+                100
+              ]
+            }
+          },
+          {
+            "name": "player2_attacked_fields",
+            "type": {
+              "array": [
+                "bool",
+                100
+              ]
+            }
+          },
+          {
+            "name": "player1_attacked_this_turn",
+            "type": "bool"
+          },
+          {
+            "name": "player2_attacked_this_turn",
+            "type": "bool"
+          },
+          {
+            "name": "player1_tried_verifing_this_turn",
+            "type": "bool"
+          },
+          {
+            "name": "player2_tried_verifing_this_turn",
+            "type": "bool"
+          },
+          {
+            "name": "player1_verified_proof_this_turn",
+            "type": "bool"
+          },
+          {
+            "name": "player2_verified_proof_this_turn",
+            "type": "bool"
+          },
+          {
+            "name": "field_player1_attacked_this_turn",
+            "type": "u8"
+          },
+          {
+            "name": "field_player2_attacked_this_turn",
+            "type": "u8"
+          },
+          {
+            "name": "player1_remaining_ship_fields",
+            "type": "u8"
+          },
+          {
+            "name": "player2_remaining_ship_fields",
+            "type": "u8"
+          },
+          {
+            "name": "turn_start_slot",
+            "type": "u64"
+          },
+          {
+            "name": "winner",
+            "type": {
+              "option": "pubkey"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "GameField",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "index",
+            "type": "u8"
+          },
+          {
+            "name": "ship_placed",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "GameFinished",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "game",
+            "type": "pubkey"
+          },
+          {
+            "name": "winner",
+            "type": {
+              "option": "pubkey"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "GamePlayer",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "address",
+            "type": "pubkey"
+          },
+          {
+            "name": "board_root",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "GameStarted",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "game",
+            "type": "pubkey"
+          },
+          {
+            "name": "player1",
+            "type": "pubkey"
+          },
+          {
+            "name": "player2",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ProofField",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "ship_placed",
+            "type": "bool"
+          },
+          {
+            "name": "salt",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ProofVerified",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "game",
+            "type": "pubkey"
+          },
+          {
+            "name": "player",
+            "type": "pubkey"
+          },
+          {
+            "name": "attacked_field",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Queue",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "players",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "GamePlayer"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "TurnFinished",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "game",
+            "type": "pubkey"
+          },
+          {
+            "name": "turn",
+            "type": "u8"
+          }
+        ]
+      }
+    }
+  ]
+}

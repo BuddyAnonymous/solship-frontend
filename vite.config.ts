@@ -13,6 +13,11 @@ export default defineConfig({
     nodePolyfills(),
     // Optionally include the node polyfill plugin to cover more Node.js APIs
   ],
+  server: {
+    watch: {
+      usePolling: true,
+    },
+  },
   optimizeDeps: {
     esbuildOptions: {
       // Node.js global to browser global polyfills
