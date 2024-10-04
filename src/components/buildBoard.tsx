@@ -4,8 +4,9 @@ import Ship from './Ship';
 import EnemyBoard from './EnemyBoard.tsx';
 import '../styles/buildBoard.css';
 import { constructMerkleTree, printMerkleTree, MerkleNode } from '../merkleTree/merkleTree.ts';
-import { program } from '../anchor/setup.ts';
+import { GameEvent, program } from '../anchor/setup.ts';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
+import { PublicKey } from '@solana/web3.js';
 import Timer from './Timer';
 import { set } from '@coral-xyz/anchor/dist/cjs/utils/features';
 
@@ -19,7 +20,7 @@ function BuildBoard() {
   ]);
 
   const { connection } = useConnection();
-  const { sendTransaction } = useWallet();
+  const { sendTransaction, publicKey } = useWallet();
   const [table, setTable] = useState(Array(10).fill(null).map(() => Array(10).fill(false)));
   const [globalDrag, setGlobalDrag] = useState(false);
   const [validSquares, setValidSquares] = useState(Array(10).fill(null).map(() => Array(10).fill(true)));
@@ -27,6 +28,10 @@ function BuildBoard() {
   const [shipsPlaced, setShipsPlaced] = useState(0);
   const [target, setTarget] = useState(null);
   const [merkleRoot, setMerkleRoot] = useState<MerkleNode | null>(null);
+  
+  const [game, setGame] = useState<GameEvent | null>(null);
+  const [enemy, setEnemy] = useState<PublicKey | null>(null);
+  const [fieldsEnemyAttacked, setFieldsEnemyAttacked] = useState(Array(10).fill(null).map(() => Array(10).fill(false)));
   const [turn, setTurn] = useState(1);
   
   const handleTimeUp = () => {
@@ -94,11 +99,20 @@ function BuildBoard() {
     }
   };
 
-  function handleAttackClick() {
+  async function handleAttackClick() {
     console.log(target);
 
     if (target !== null) {
-      program.methods.attack(target).rpc();
+      const tx = await program.methods.attack(target).transaction();
+      try {
+        const txSignature = sendTransaction(
+          tx,
+          connection,
+        );
+        console.log("Transaction sent: ", txSignature);
+      } catch (error) {
+        console.error("Transaction error", error);
+      }
     }
 
     setTarget(null);
@@ -122,6 +136,74 @@ function BuildBoard() {
 
     return byteArray;
   }
+
+  function indexToCoords(index: number): [number, number] {
+    return [Math.floor(index / 10), index % 10];
+  }
+
+  program.addEventListener('gameStarted', (gameStarted) => {
+    const selfPublicKey = publicKey;
+    if (gameStarted.player1 !== selfPublicKey && gameStarted.player2 !== selfPublicKey) return;
+
+    if (gameStarted.player1 === selfPublicKey) {
+      setEnemy(gameStarted.player2);
+    } else {
+      setEnemy(gameStarted.player1);
+    }
+
+    console.log("Game started", gameStarted);
+    setGame(game);
+  });
+
+  program.addEventListener('turnFinished', (turnFinished) => {
+    if (turnFinished.game !== game?.game) return;
+
+    console.log("Turn finished", turnFinished);
+  });
+
+  program.addEventListener('fieldAttacked', async (fieldAttacked) => {
+    if (fieldAttacked.game !== game?.game) return;
+
+    if (fieldAttacked.player === enemy) {
+      const attackedField = fieldAttacked.attackedField;
+
+      setFieldsEnemyAttacked((prev) => {
+        const newFieldsEnemyAttacked = [...prev];
+        const [row, col] = indexToCoords(attackedField);
+        newFieldsEnemyAttacked[row][col] = true;
+        return newFieldsEnemyAttacked;
+      });
+      
+      const proof = generateProof(attackedField);
+
+      const [row, col] = indexToCoords(attackedField);
+      const tx = await program.methods.verifyProof(proof, { index: attackedField, ship_placed: table[row][col] }).transaction();
+
+      try {
+        const txSignature = sendTransaction(
+          tx,
+          connection,
+        );
+        console.log("Transaction sent: ", txSignature);
+      } catch (error) {
+        console.error("Transaction error", error);
+      }
+    }
+
+    console.log("Field attacked: ", fieldAttacked);
+  });
+
+  program.addEventListener('proofVerified', (proofVerified) => {
+    if (proofVerified.game !== game?.game) return;
+
+    console.log("Proof verified: ", proofVerified);
+  });
+
+  program.addEventListener('gameFinished', (gameFinished) => {
+    if (gameFinished.game !== game?.game) return;
+    
+    console.log("Game finished", gameFinished);
+  });
 
   return (
     isReady ? (
