@@ -6,6 +6,8 @@ import '../styles/buildBoard.css';
 import { constructMerkleTree, printMerkleTree, MerkleNode } from '../merkleTree/merkleTree.ts';
 import { program } from '../anchor/setup.ts';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
+import Timer from './Timer';
+import { set } from '@coral-xyz/anchor/dist/cjs/utils/features';
 
 function BuildBoard() {
   const [SHIP_IMAGES, setSHIP_IMAGES] = useState([
@@ -25,6 +27,37 @@ function BuildBoard() {
   const [shipsPlaced, setShipsPlaced] = useState(0);
   const [target, setTarget] = useState(null);
   const [merkleRoot, setMerkleRoot] = useState<MerkleNode | null>(null);
+  const [turn, setTurn] = useState(1);
+  
+  const handleTimeUp = () => {
+    setTurn(turn + 1);
+  };
+
+  function generateProof(fieldIndex: number) {
+    const _merkleRoot: MerkleNode = constructMerkleTree(table)
+    let dirArray : number[] = []
+    while(dirArray.length < 7){
+        dirArray.unshift(fieldIndex % 2)
+        fieldIndex = Math.ceil(fieldIndex / 2)
+    }
+
+    let currNode: MerkleNode = _merkleRoot
+    let tempProof: string[] = []
+    for(const num of dirArray){
+        if(num == 0){
+            tempProof.unshift(currNode.left?.hash!)
+            currNode = currNode.right!
+        }
+        else{
+            tempProof.unshift(currNode.right?.hash!)
+            currNode = currNode.left!
+        }
+    }
+    tempProof.push(_merkleRoot.hash)
+
+    return tempProof
+
+}
 
   const handleReadyClick = async () => {
     const _merkleRoot: MerkleNode = constructMerkleTree(table);
@@ -69,6 +102,10 @@ function BuildBoard() {
     }
 
     setTarget(null);
+    setTurn(turn + 1);
+    for (let i = 0; i < 100; i++) {
+      document.getElementById(i + "-enemy").className = "enemy-board-square"
+  }
   }
 
   function hexStringToByteArray(hexString: string): number[] {
@@ -89,13 +126,23 @@ function BuildBoard() {
   return (
     isReady ? (
       <div className="game-container">
+        <div>
+        <h2 style={{ color: 'teal', textShadow:'2px 2px 5px rgba(0,0,0,0.5)' }}>Turn: {turn}</h2>
+        <Timer onTimeUp={handleTimeUp} turn={turn} />
+        </div>
         <div className="board-container">
           <Board table={table} dragging={false} validSquares={validSquares} isReady={isReady} setTable={setTable} setValidSquares={setValidSquares} />
         </div>
         <div className="board-container">
           <EnemyBoard target={target} setTarget={setTarget} merkleRoot={merkleRoot} />
         </div>
-        <div className={target != null ? "attack-button" : "attack-button-locked"} onClick={handleAttackClick}>ATTACK</div>
+        <div className={target != null ? "attack-button" : "attack-button-locked"} onClick={target != null ? handleAttackClick : null}>ATTACK</div>
+        <div className='guide'>
+        <h1>HOW TO PLAY:</h1>
+        DRAG SHIP TO PLACE
+        <br />
+        PRESS R WHILE DRAGGING TO ROTATE
+        </div>
       </div>
     ) : (
       <div className="build-board-container">

@@ -61,26 +61,34 @@
 }
 
 .attack-button {
-  background-color: #ff4040;
-  color: white;
-  border: none;
+  background-color: #c82e2e;
+  color: rgb(243, 214, 214);
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+  border: 3px solid #862323;
   padding: 15px 30px;
   border-radius: 10px;
-  font-size: 1.5rem;
+  font-size: 1.7rem;
   cursor: pointer;
   transition: transform 0.1s, background-color 0.1s;
 }
 
 .attack-button-locked {
-  background-color: #f2bebe;
-  color: white;
-  border: none;
+  background-color: #eeaeae;
+  color: rgb(243, 214, 214);
+  border: 3px solid #eeaeae;
   padding: 15px 30px;
   border-radius: 10px;
-  font-size: 1.5rem;
+  font-size: 1.7rem;
 }
 
 .attack-button:hover {
   background-color: #862323;
   transform: scale(1.2); /* Scale the button up by 20% */
+}
+
+.guide{
+  margin-top: 300px;
+  color: white;
+  font-size: 25px;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
 }
