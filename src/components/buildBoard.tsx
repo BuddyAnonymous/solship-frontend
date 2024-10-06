@@ -25,9 +25,10 @@ function BuildBoard() {
   const [validSquares, setValidSquares] = useState(Array(10).fill(null).map(() => Array(10).fill(true)));
   const [isReady, setIsReady] = useState(false);
   const [shipsPlaced, setShipsPlaced] = useState(0);
-  const [target, setTarget] = useState(null);
+  const [target, setTarget] = useState<string | null>(null);
   const [merkleRoot, setMerkleRoot] = useState<MerkleNode | null>(null);
   const [turn, setTurn] = useState(1);
+  const [attackedFields, setAttackedFields] = useState<number[]>([]);
   
   const handleTimeUp = () => {
     setTurn(turn + 1);
@@ -98,13 +99,17 @@ function BuildBoard() {
     console.log(target);
 
     if (target !== null) {
+      setAttackedFields(prev => [...prev, parseInt(target.split("-")[0])]);
       program.methods.attack(target).rpc();
     }
 
     setTarget(null);
     setTurn(turn + 1);
     for (let i = 0; i < 100; i++) {
-      document.getElementById(i + "-enemy").className = "enemy-board-square"
+      const element = document.getElementById(i + "-enemy");
+      if(element && element.className === "enemy-square-clicked") {
+        element.className = "enemy-board-square";
+      }
   }
   }
 
@@ -125,23 +130,19 @@ function BuildBoard() {
 
   return (
     isReady ? (
-      <div className="game-container">
-        <div>
-        <h2 style={{ color: 'teal', textShadow:'2px 2px 5px rgba(0,0,0,0.5)' }}>Turn: {turn}</h2>
-        <Timer onTimeUp={handleTimeUp} turn={turn} />
+      <div style={{marginBottom:'100px'}}>
+        <div style={{marginBottom: '50px', marginRight: '200px'}}>
+                  <h2 style={{ color: 'teal', textShadow:'2px 2px 5px rgba(255,255,255,0.15)' }}>Turn: {turn}</h2>
+                  <Timer onTimeUp={handleTimeUp} turn={turn} />
         </div>
-        <div className="board-container">
-          <Board table={table} dragging={false} validSquares={validSquares} isReady={isReady} setTable={setTable} setValidSquares={setValidSquares} />
-        </div>
-        <div className="board-container">
-          <EnemyBoard target={target} setTarget={setTarget} merkleRoot={merkleRoot} />
-        </div>
-        <div className={target != null ? "attack-button" : "attack-button-locked"} onClick={target != null ? handleAttackClick : null}>ATTACK</div>
-        <div className='guide'>
-        <h1>HOW TO PLAY:</h1>
-        DRAG SHIP TO PLACE
-        <br />
-        PRESS R WHILE DRAGGING TO ROTATE
+        <div className="game-container">
+          <div className="board-container">
+            <Board table={table} dragging={false} validSquares={validSquares} isReady={isReady} setTable={setTable} setValidSquares={setValidSquares} />
+          </div>
+          <div className="board-container">
+            <EnemyBoard target={target} setTarget={setTarget} merkleRoot={merkleRoot} attackedFields={attackedFields} />
+          </div>
+          <div className={target != null ? "attack-button" : "attack-button-locked"} onClick={target != null ? handleAttackClick : null}>ATTACK</div>
         </div>
       </div>
     ) : (
@@ -171,6 +172,12 @@ function BuildBoard() {
         <div className="board-and-button">
           <Board table={table} dragging={globalDrag} validSquares={validSquares} isReady={isReady} setTable={setTable} setValidSquares={setValidSquares} SHIP_IMAGES={SHIP_IMAGES} setSHIP_IMAGES={setSHIP_IMAGES} shipsPlaced={shipsPlaced} setShipsPlaced={setShipsPlaced} />
           <button className={shipsPlaced == 5 ? "ready-button" : "not-ready-button"} onClick={shipsPlaced == 5 ? handleReadyClick : null} >I'm ready</button>
+        </div>
+        <div className='guide'>
+        <h1>HOW TO PLAY:</h1>
+        DRAG SHIP TO PLACE
+        <br />
+        PRESS R WHILE DRAGGING TO ROTATE
         </div>
       </div>
     )

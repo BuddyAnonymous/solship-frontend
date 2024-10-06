@@ -21,10 +21,10 @@
 
 .ready-button {
   margin-top: 20px;
-  background-color: #ff6161;
+  background-color: #5d1568;
   color: white;
-  border: none;
   padding: 15px 30px;
+  border: 3px solid #410f49;
   border-radius: 10px;
   font-size: 1.5rem;
   cursor: pointer;
@@ -33,9 +33,9 @@
 
 .not-ready-button {
   margin-top: 20px;
-  background-color: #f2bebe;
+  background-color: #6f5a6a;
+  border: 3px solid #3e2741;
   color: white;
-  border: none;
   padding: 15px 30px;
   border-radius: 10px;
   font-size: 1.5rem;
@@ -43,7 +43,7 @@
 }
 
 .ready-button:hover {
-  background-color: #ff4040;
+  background-color: #8e209f;
 }
 
 .game-container {
@@ -51,7 +51,6 @@
   justify-content: space-around;
   align-items: center;
   gap: 50px;
-  height: 100vh;
 }
 
 .board-container {
@@ -61,10 +60,10 @@
 }
 
 .attack-button {
-  background-color: #c82e2e;
+  background-color: #5d1568;
   color: rgb(243, 214, 214);
   text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
-  border: 3px solid #862323;
+  border: 3px solid #410f49;
   padding: 15px 30px;
   border-radius: 10px;
   font-size: 1.7rem;
@@ -73,21 +72,23 @@
 }
 
 .attack-button-locked {
-  background-color: #eeaeae;
+  background-color: #6f5a6a;
+  border: 3px solid #3e2741;
   color: rgb(243, 214, 214);
-  border: 3px solid #eeaeae;
   padding: 15px 30px;
   border-radius: 10px;
   font-size: 1.7rem;
 }
 
 .attack-button:hover {
-  background-color: #862323;
+  background-color: #8e209f;
   transform: scale(1.2); /* Scale the button up by 20% */
 }
 
 .guide{
-  margin-top: 300px;
+  margin-left: 50px;
+  align-self: center;
+  transform: translateY(-50%);
   color: white;
   font-size: 25px;
   text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);

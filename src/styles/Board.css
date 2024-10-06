@@ -11,28 +11,28 @@
 .board-square {
   width: 50px;
   height: 50px;
-  background-color: #8d98a1;
+  background-color: #7690a5;
   border: 1px solid rgb(0, 0, 0);
 }
 
 .board-square-dragging {
   width: 50px;
   height: 50px;
-  background-color: #1eeb3d;
+  background-color: #0d6f22;
   border: 1px solid rgb(0, 0, 0);
 }
 
 .board-square-placed {
   width: 50px;
   height: 50px;
-  background-color: lightblue;
+  background-color: #D1C4FC;
   border: 1px solid rgb(0, 0, 0);
 }
 
 .board-square-invalid {
   width: 50px;
   height: 50px;
-  background-color: #ee3535;
+  background-color: #b22f2f;
   border: 1px solid rgb(0, 0, 0);
 }
 

@@ -1,5 +1,5 @@
 .ship img {
-    border: 2px solid black;
+    border: 2px solid rgb(88, 44, 163);
     height: 100%;
     cursor: grab;
     width: 100%;
@@ -20,7 +20,7 @@
     position: absolute; /* Ensure ships can be positioned absolutely */
   }
   .vert img{
-    border: 2px solid black;
+    border: 2px solid rgb(88, 44, 163);
     cursor: grab;
     z-index: 0;
   }

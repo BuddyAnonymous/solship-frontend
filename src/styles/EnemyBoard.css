@@ -11,18 +11,30 @@
 .enemy-square-clicked {
   width: 50px;
   height: 50px;
-  background-color: #482020;
+  box-shadow: 0 0 10px 5px rgb(199, 135, 239), /* Stronger cyan glow */
+              0 0 30px 15px rgba(138, 43, 226, 1); /* Stronger purple glow */
+  transform: scale(1.05); /* More zoom on click */
+  background-color: blueviolet;
   border: 1px solid rgb(0, 0, 0);
 }
 
 .enemy-board-square {
   width: 50px;
   height: 50px;
-  background-color: #8d98a1;
+  background-color: #7690a5;
+  border: 1px solid rgb(0, 0, 0);
+}
+
+.enemy-board-square-attacked {
+  width: 50px;
+  height: 50px;
+  background-color:  #FF3C3C;
   border: 1px solid rgb(0, 0, 0);
 }
 
 .enemy-board-square:hover {
-  background-color: #5f6f7d;
+  box-shadow: 0 0 15px 5px rgba(0, 255, 255, 0.7), /* Cyan glow */
+              0 0 20px 10px rgba(138, 43, 226, 0.7); /* Purple glow */
+  transform: scale(1.05); /* Slight zoom on hover */
 }
 
