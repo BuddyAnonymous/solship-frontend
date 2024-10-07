@@ -144,9 +144,9 @@ function BuildBoard() {
 		// 	program.removeEventListener(subId5);
 		// };
 	}, [game]);
-
+	
 	const handleTimeUp = () => {
-		// setTurn(turn + 1);
+		// claimWin();
 	};
 
 	function generateProof(fieldIndex: number) {
