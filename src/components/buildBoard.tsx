@@ -140,6 +140,17 @@ function BuildBoard() {
 			console.log("Game finished", gameFinished);
 
 			if (gameFinished.game.toBase58() !== game?.game.toBase58()) return;
+
+			if (gameFinished.winner.toBase58() === publicKey?.toBase58()) {
+				console.log("You won!");
+			}
+			if (gameFinished.winner.toBase58() === enemy?.toBase58()) {
+				console.log("You lost!");
+			}
+			if (gameFinished.winner.toBase58() === PublicKey.default.toBase58()) {
+				console.log("Draw!");
+			}
+
 		});
 
 		// return () => {
