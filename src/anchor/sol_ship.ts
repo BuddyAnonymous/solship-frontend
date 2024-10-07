@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/sol_ship.json`.
  */
 export type SolShip = {
-  "address": "6ePThmE1BtfXSoxnxCXKx3xdGrmJmbbXu9Pk347KjJLu",
+  "address": "8ud2dBF8N4f9eZwiWnYZ3TEXEaEvm4QHr6Tu6tYKkJ5T",
   "metadata": {
     "name": "solShip",
     "version": "0.1.0",
@@ -31,7 +31,8 @@ export type SolShip = {
           "signer": true
         },
         {
-          "name": "game"
+          "name": "game",
+          "writable": true
         }
       ],
       "args": [
@@ -59,7 +60,8 @@ export type SolShip = {
           "signer": true
         },
         {
-          "name": "game"
+          "name": "game",
+          "writable": true
         }
       ],
       "args": [
@@ -260,19 +262,23 @@ export type SolShip = {
           "signer": true
         },
         {
-          "name": "game"
+          "name": "game",
+          "writable": true
         }
       ],
       "args": [
         {
           "name": "proof",
           "type": {
-            "vec": {
-              "array": [
-                "u8",
-                32
-              ]
-            }
+            "array": [
+              {
+                "array": [
+                  "u8",
+                  32
+                ]
+              },
+              7
+            ]
           }
         },
         {
@@ -426,6 +432,11 @@ export type SolShip = {
       "code": 6008,
       "name": "enemyPlayedTurn",
       "msg": "Enemy played turn"
+    },
+    {
+      "code": 6009,
+      "name": "alreadyAttackedThisTurn",
+      "msg": "Player already attacked this turn"
     }
   ],
   "types": [
@@ -485,24 +496,6 @@ export type SolShip = {
             "type": "u8"
           },
           {
-            "name": "player1AttackedFields",
-            "type": {
-              "array": [
-                "bool",
-                100
-              ]
-            }
-          },
-          {
-            "name": "player2AttackedFields",
-            "type": {
-              "array": [
-                "bool",
-                100
-              ]
-            }
-          },
-          {
             "name": "player1AttackedThisTurn",
             "type": "bool"
           },
@@ -548,9 +541,7 @@ export type SolShip = {
           },
           {
             "name": "winner",
-            "type": {
-              "option": "pubkey"
-            }
+            "type": "pubkey"
           }
         ]
       }
@@ -582,9 +573,7 @@ export type SolShip = {
           },
           {
             "name": "winner",
-            "type": {
-              "option": "pubkey"
-            }
+            "type": "pubkey"
           }
         ]
       }
@@ -638,10 +627,6 @@ export type SolShip = {
           {
             "name": "shipPlaced",
             "type": "bool"
-          },
-          {
-            "name": "salt",
-            "type": "u64"
           }
         ]
       }
