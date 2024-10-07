@@ -128,6 +128,12 @@ function BuildBoard() {
 			console.log("Proof verified: ", proofVerified);
 
 			if (proofVerified.game.toBase58() !== game?.game.toBase58()) return;
+
+			if (proofVerified.player.toBase58() !== enemy?.toBase58()) return;
+
+			if (proofVerified.shipPlaced == true) {
+				// TODO: Mark the field as ship hit
+			}
 		});
 
 		const subId5 = program.addEventListener('gameFinished', (gameFinished) => {
