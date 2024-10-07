@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import '../styles/Ship.css';
 
-function Ship({ id, src, alt, style, table, setTable, sqWidth, setGlobalDrag, validSquares, setValidSquares ,SHIP_IMAGES, setSHIP_IMAGES, shipsPlaced, setShipsPlaced}) {
+function Ship({ id, src, alt, style, table, setTable, sqWidth, setGlobalDrag, validSquares, setValidSquares, SHIP_IMAGES, setSHIP_IMAGES, shipsPlaced, setShipsPlaced }) {
 	const [isDragging, setIsDragging] = useState(false);
 	const [position, setPosition] = useState({ top: 0, left: 0 });
 	const [initialPosition, setInitialPosition] = useState({ top: 0, left: 0 });
@@ -20,18 +20,18 @@ function Ship({ id, src, alt, style, table, setTable, sqWidth, setGlobalDrag, va
 
 	useEffect(() => {
 		if (isDragging) {
-		  window.addEventListener('mousemove', handleMouseMove);
-		  window.addEventListener('mouseup', handleMouseUp);
+			window.addEventListener('mousemove', handleMouseMove);
+			window.addEventListener('mouseup', handleMouseUp);
 		} else {
-		  window.removeEventListener('mousemove', handleMouseMove);
-		  window.removeEventListener('mouseup', handleMouseUp);
+			window.removeEventListener('mousemove', handleMouseMove);
+			window.removeEventListener('mouseup', handleMouseUp);
 		}
-	
+
 		return () => {
-		  window.removeEventListener('mousemove', handleMouseMove);
-		  window.removeEventListener('mouseup', handleMouseUp);
+			window.removeEventListener('mousemove', handleMouseMove);
+			window.removeEventListener('mouseup', handleMouseUp);
 		};
-	  }, [isDragging]);
+	}, [isDragging]);
 
 	const handleMouseDown = (e) => {
 		setIsDragging(true);
@@ -47,12 +47,12 @@ function Ship({ id, src, alt, style, table, setTable, sqWidth, setGlobalDrag, va
 			setPosition({
 				top: e.clientY - draggedElementRef.current.offsetHeight / 2,
 				left: e.clientX - draggedElementRef.current.offsetWidth / 2,
-			  });
+			});
 		}
 	};
 
 	const handleMouseUp = (event) => {
-		
+
 		setGlobalDrag(false);
 		setIsDragging(false);
 		elementDrag.current = false;
@@ -79,9 +79,9 @@ function Ship({ id, src, alt, style, table, setTable, sqWidth, setGlobalDrag, va
 									return newTable;
 								});
 								setValidSquares(prevTable => {
-									const newTable = prevTable.map(row => [...row]); 
-									for(let i = Math.max(0,parseInt(element.id / 10) - 1); i < Math.min(10,parseInt(element.id / 10) + 2); i++){
-										for(let j = Math.max(0,parseInt(element.id % 10) - 1); j < Math.min(10,parseInt(element.id % 10) + squareLength + 1); j++){
+									const newTable = prevTable.map(row => [...row]);
+									for (let i = Math.max(0, parseInt(element.id / 10) - 1); i < Math.min(10, parseInt(element.id / 10) + 2); i++) {
+										for (let j = Math.max(0, parseInt(element.id % 10) - 1); j < Math.min(10, parseInt(element.id % 10) + squareLength + 1); j++) {
 											newTable[i][j] = false;
 										}
 									}
@@ -99,7 +99,7 @@ function Ship({ id, src, alt, style, table, setTable, sqWidth, setGlobalDrag, va
 								validPlacement = false;
 							}
 						}
-						if(validPlacement){
+						if (validPlacement) {
 							for (let i = 0; i < squareLength; i++) {
 								found = true;
 								setTable(prevTable => {
@@ -107,11 +107,11 @@ function Ship({ id, src, alt, style, table, setTable, sqWidth, setGlobalDrag, va
 									newTable[parseInt(element.id / 10) + i][parseInt(element.id % 10)] = true;
 									return newTable;
 								});
-								
+
 								setValidSquares(prevTable => {
-									const newTable = prevTable.map(row => [...row]); 
-									for(let i = Math.max(0,parseInt(element.id / 10) - 1); i < Math.min(10,parseInt(element.id / 10) + squareLength + 1); i++){
-										for(let j = Math.max(0,parseInt(element.id % 10) - 1); j < Math.min(10,parseInt(element.id % 10) + 2); j++){
+									const newTable = prevTable.map(row => [...row]);
+									for (let i = Math.max(0, parseInt(element.id / 10) - 1); i < Math.min(10, parseInt(element.id / 10) + squareLength + 1); i++) {
+										for (let j = Math.max(0, parseInt(element.id % 10) - 1); j < Math.min(10, parseInt(element.id % 10) + 2); j++) {
 											newTable[i][j] = false;
 										}
 									}
@@ -154,14 +154,14 @@ function Ship({ id, src, alt, style, table, setTable, sqWidth, setGlobalDrag, va
 	const handleKeyDown = (e) => {
 		if (e.key.toLowerCase() === 'r' && elementDrag.current === true) {
 			if (draggedElementRef !== null) {
-				if(draggedElementRef.current.parentElement.className !== "vert"){
+				if (draggedElementRef.current.parentElement.className !== "vert") {
 					let width = parseInt(draggedElementRef.current.parentElement.style.width.slice(0, -2))
 					let height = parseInt(draggedElementRef.current.parentElement.style.height.slice(0, -2))
 					draggedElementRef.current.parentElement.style.width = `${height}px`
 					draggedElementRef.current.parentElement.style.height = `${width}px`
 					draggedElementRef.current.parentElement.className = "vert"
 				}
-				else{
+				else {
 					let width = parseInt(draggedElementRef.current.parentElement.style.width.slice(0, -2))
 					let height = parseInt(draggedElementRef.current.parentElement.style.height.slice(0, -2))
 					draggedElementRef.current.parentElement.style.width = `${height}px`
