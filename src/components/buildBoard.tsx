@@ -6,9 +6,17 @@ import '../styles/buildBoard.css';
 import { constructMerkleTree, printMerkleTree, MerkleNode } from '../merkleTree/merkleTree.ts';
 import { GameEvent, program } from '../anchor/setup.ts';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
-import { PublicKey, SystemProgram } from '@solana/web3.js';
+import { Enum, PublicKey, SystemProgram } from '@solana/web3.js';
 import Timer from './Timer';
 import { ComputeBudgetProgram } from '@solana/web3.js';
+import { set } from '@coral-xyz/anchor/dist/cjs/utils/features';
+
+enum GameWinner {
+	WINNER,
+	LOSER,
+	DRAW,
+	NONE
+}
 
 function BuildBoard() {
 	const [SHIP_IMAGES, setSHIP_IMAGES] = useState([
@@ -18,6 +26,7 @@ function BuildBoard() {
 		['/images/ship.png', 3, 'ship3-2'],
 		['/images/ship.png', 2, 'ship2'],
 	]);
+
 
 	const { connection } = useConnection();
 	const { sendTransaction, publicKey } = useWallet();
@@ -34,10 +43,14 @@ function BuildBoard() {
 	const [enemy, setEnemy] = useState<PublicKey | null>(null);
 	const [fieldsEnemyAttacked, setFieldsEnemyAttacked] = useState(Array(10).fill(null).map(() => Array(10).fill(false)));
 	const [turn, setTurn] = useState(1);
+	const [enemyShips, setEnemyShips] = useState(Array(10).fill(null).map(() => Array(10).fill(false)));
+	const [gameWinner, setGameWinner] = useState(GameWinner.NONE);
 
 	const isSubscribed = useRef(false);
 
 	useEffect(() => {
+		setGameWinner(GameWinner.WINNER);
+
 		const fetchGameTest = async () => {
 			const gameTest = await program.account.game.all();
 			console.log(gameTest);
@@ -132,7 +145,12 @@ function BuildBoard() {
 			if (proofVerified.player.toBase58() !== enemy?.toBase58()) return;
 
 			if (proofVerified.shipPlaced == true) {
-				// TODO: Mark the field as ship hit
+				setEnemyShips((prev) => {
+					const [row, col] = indexToCoords(proofVerified.attackedField);
+					const newEnemyShips = [...prev];
+					newEnemyShips[row][col] = true;
+					return newEnemyShips;
+				});
 			}
 		});
 
@@ -143,12 +161,15 @@ function BuildBoard() {
 
 			if (gameFinished.winner.toBase58() === publicKey?.toBase58()) {
 				console.log("You won!");
+				setGameWinner(GameWinner.WINNER);
 			}
 			if (gameFinished.winner.toBase58() === enemy?.toBase58()) {
 				console.log("You lost!");
+				setGameWinner(GameWinner.LOSER);
 			}
 			if (gameFinished.winner.toBase58() === PublicKey.default.toBase58()) {
 				console.log("Draw!");
+				setGameWinner(GameWinner.DRAW);
 			}
 
 		});
@@ -161,7 +182,7 @@ function BuildBoard() {
 		// 	program.removeEventListener(subId5);
 		// };
 	}, [game]);
-	
+
 	const handleTimeUp = () => {
 		// claimWin();
 	};
@@ -324,19 +345,36 @@ function BuildBoard() {
 		return [Math.floor(index / 10), index % 10];
 	}
 
+
+	const renderGameState = (winner: GameWinner) => {
+		switch (winner) {
+			case GameWinner.WINNER:
+				return <h1 style={{ color: 'green', textShadow: '2px 2px 5px rgba(255,255,255,0.15)', fontSize: '80px', marginBottom: '20px' }}>YOU WON!</h1>;
+			case GameWinner.LOSER:
+				return <h1 style={{ color: 'red', textShadow: '2px 2px 5px rgba(255,255,255,0.15)', fontSize: '80px', marginBottom: '20px' }}>YOU LOST!</h1>;
+			case GameWinner.DRAW:
+				return <h1 style={{ color: 'yellow', textShadow: '2px 2px 5px rgba(255,255,255,0.15)', fontSize: '80px', marginBottom: '20px'}}>DRAW!</h1>;
+			default:
+				return (<div>
+					<h2 style={{ color: 'teal', textShadow: '2px 2px 5px rgba(255,255,255,0.15)' }}>Turn: {turn}</h2>
+					<Timer onTimeUp={handleTimeUp} turn={turn} running={timerRunning} />
+				</div>);
+
+		}
+	};
+
 	return (
 		isReady ? (
 			<div style={{ marginBottom: '100px' }}>
-				<div style={{ marginBottom: '50px', marginRight: '200px' }}>
-					<h2 style={{ color: 'teal', textShadow: '2px 2px 5px rgba(255,255,255,0.15)' }}>Turn: {turn}</h2>
-					<Timer onTimeUp={handleTimeUp} turn={turn} running={timerRunning} />
+				<div style={{ marginRight: '200px' }}>
+					{renderGameState(gameWinner)}
 				</div>
 				<div className="game-container">
 					<div className="board-container">
-						<Board table={table} dragging={false} validSquares={validSquares} isReady={isReady} setTable={setTable} setValidSquares={setValidSquares} />
+						<Board table={table} dragging={false} validSquares={validSquares} isReady={isReady} setTable={setTable} setValidSquares={setValidSquares} fieldsEnemyAttacked={fieldsEnemyAttacked} />
 					</div>
 					<div className="board-container">
-						<EnemyBoard target={target} setTarget={setTarget} merkleRoot={merkleRoot} attackedFields={attackedFields} />
+						<EnemyBoard target={target} setTarget={setTarget} merkleRoot={merkleRoot} attackedFields={attackedFields} enemyShips={enemyShips} />
 					</div>
 					<div className={target != null ? "attack-button" : "attack-button-locked"} onClick={target != null ? handleAttackClick : null}>ATTACK</div>
 				</div>
@@ -366,7 +404,7 @@ function BuildBoard() {
 					))}
 				</div>
 				<div className="board-and-button">
-					<Board table={table} dragging={globalDrag} validSquares={validSquares} isReady={isReady} setTable={setTable} setValidSquares={setValidSquares} SHIP_IMAGES={SHIP_IMAGES} setSHIP_IMAGES={setSHIP_IMAGES} shipsPlaced={shipsPlaced} setShipsPlaced={setShipsPlaced} />
+					<Board table={table} dragging={globalDrag} validSquares={validSquares} isReady={isReady} setTable={setTable} setValidSquares={setValidSquares} SHIP_IMAGES={SHIP_IMAGES} setSHIP_IMAGES={setSHIP_IMAGES} shipsPlaced={shipsPlaced} setShipsPlaced={setShipsPlaced} fieldsEnemyAttacked={fieldsEnemyAttacked} />
 					<button className={shipsPlaced == 5 ? "ready-button" : "not-ready-button"} onClick={shipsPlaced == 5 ? handleReadyClick : null} >I'm ready</button>
 				</div>
 				<div className='guide'>

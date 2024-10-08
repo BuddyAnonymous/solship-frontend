@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import '../styles/Board.css';
 
-function Board({ table, dragging, validSquares, isReady, setTable, setValidSquares, SHIP_IMAGES, setSHIP_IMAGES, shipsPlaced, setShipsPlaced }) {
+function Board({ table, dragging, validSquares, isReady, setTable, setValidSquares, SHIP_IMAGES, setSHIP_IMAGES, shipsPlaced, setShipsPlaced, fieldsEnemyAttacked }) {
 
 	function handleOnClick(e) {
 		if (e.target.className != "ship-image") return
@@ -119,17 +119,32 @@ function Board({ table, dragging, validSquares, isReady, setTable, setValidSquar
 		}
 	}
 
+	const getClassName = (rowIndex,colIndex) => {
+		if (table[rowIndex][colIndex]) {
+			return "board-square-placed";
+		} else if (dragging) {
+			if (validSquares[rowIndex][colIndex]) {
+				return "board-square-dragging";
+			} else {
+				return "board-square-invalid";
+			}
+		} else {
+			return "board-square";
+		}
+	};
+
+	
 	const rows = Array.from({ length: 10 }, (_, rowIndex) =>
 		Array.from({ length: 10 }, (_, colIndex) => (
 			<div
 				key={`${rowIndex}-${colIndex}`}
-				className={table[rowIndex][colIndex] ? "board-square-placed" : dragging ? validSquares[rowIndex][colIndex] ? "board-square-dragging" : "board-square-invalid" : "board-square"}
+				className={getClassName(rowIndex, colIndex)}
 				id={rowIndex * 10 + colIndex}
 				onClick={!isReady ? handleOnClick : null}
 			>
 				{table[rowIndex][colIndex] ? (
-					<img src="/images/ship.png" alt="Ship" className="ship-image" />
-				) : null}
+					<img src={fieldsEnemyAttacked[rowIndex][colIndex] ? "/images/ship_killed.png" : "/images/ship.png"} alt="Ship" className="ship-image" />
+				) : fieldsEnemyAttacked[rowIndex][colIndex] ? <img src="/images/ship_missed.png" alt="" className="ship-image"/> : null}
 			</div>
 		))
 	);
