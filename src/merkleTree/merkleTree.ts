@@ -13,26 +13,35 @@ export type MerkleNode = {
     fieldIndex?: number; // Index of the field in the board
 };
 
-export async function hash(data: any, secret: bigint = BigInt(0)): Promise<string> {
-    return await blake3(data)
+// export async function hash(data: any, secret: bigint = BigInt(0)): Promise<string> {
+//     return await blake3(data)
 
 
-    const hash = createHash('sha256');
-    // Incorporate the secret into the hash. Convert bigint to a buffer/string as needed.
-    hash.update(JSON.stringify(data) + secret.toString());
-    return hash.digest('hex');
-}
+//     const hash = createHash('sha256');
+//     // Incorporate the secret into the hash. Convert bigint to a buffer/string as needed.
+//     hash.update(JSON.stringify(data) + secret.toString());
+//     return hash.digest('hex');
+// }
 
-export async function constructMerkleTree(board: boolean[][]): Promise<MerkleNode> {
+export async function constructMerkleTree(board: boolean[][]): Promise<[MerkleNode, number[][]]> {
+    let secrets: number[][] = Array.from({ length: 10 }, () => Array(10).fill(0));
     let nodes: MerkleNode[] = await Promise.all(board.flat().map(async (cell, index) => {
         // Generate or assign a unique u64 secret for each cell
         const secret = BigInt(Math.floor(rng.random() * Number.MAX_SAFE_INTEGER));
-        const buffer = new Uint8Array(2); // 2 bytes: one for index, one for shipPlaced
+        const buffer = new Uint8Array(2); // 1 byte for index, 1 byte for shipPlaced, 8 bytes for secret
         buffer[0] = index; // First byte for index (0-255)
         buffer[1] = cell ? 1 : 0; // Second byte for shipPlaced (boolean to 0 or 1)
-        const h = await hash(buffer, secret);
+        // const secretBytes = new DataView(new ArrayBuffer(8));
+        // secretBytes.setBigUint64(0, secret, true); // true for little-endian
+
+        // buffer.set(new Uint8Array(secretBytes.buffer), 2); // Set the secret bytes starting at index 2
+        const h = await blake3(buffer);
         console.log("Buffer for index", index, "and cell", cell, ":", buffer);
         console.log("Hash: ", h)
+
+        const rowIndex = Math.floor(index / 10);
+        const colIndex = index % 10;
+        secrets[rowIndex][colIndex] = Number(secret);
         return { hash: h, data: cell, secret: secret, fieldIndex: index };
     }));
 
@@ -41,8 +50,10 @@ export async function constructMerkleTree(board: boolean[][]): Promise<MerkleNod
 
     // Add default nodes to make the total count a power of 2
     while (nodes.length < nextPowerOf2) {
-        const buffer = new Uint8Array(2);
-        nodes.push({ hash: await hash(buffer), data: undefined, secret: 0n });
+        const buffer = new Uint8Array(2)
+        buffer[0] = nodes.length;
+        buffer[1] = 0;
+        nodes.push({ hash: await blake3(buffer), data: undefined, secret: 0n });
     }
 
     while (nodes.length > 1) {
@@ -55,12 +66,12 @@ export async function constructMerkleTree(board: boolean[][]): Promise<MerkleNod
             const combinedHash = new Uint8Array(leftHash.length + rightHash.length);
             combinedHash.set(leftHash);
             combinedHash.set(rightHash, leftHash.length);
-            const parentHash = await hash(combinedHash);
+            const parentHash = await blake3(combinedHash);
             parentNodes.push({ hash: parentHash, left, right });
         }
         nodes = parentNodes;
     }
-    return nodes[0]; // Root node
+    return [nodes[0], secrets]; // Root node and secrets array
 }
 
 function hexToUint8Array(hex) {

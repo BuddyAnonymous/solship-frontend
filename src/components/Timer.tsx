@@ -15,7 +15,7 @@ const Timer = ({ onTimeUp, turn, running }) => {
 	useEffect(() => {
 		if (!running) return; // Do nothing if the timer is not running
 
-		if (elapsedTime >= 30200) { // 30 seconds = 30000 milliseconds
+		if (elapsedTime >= 35200) { // 30 seconds = 30000 milliseconds
 			onTimeUp(); // Trigger callback when time's up
 			return;
 		}

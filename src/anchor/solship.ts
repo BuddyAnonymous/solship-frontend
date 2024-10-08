@@ -2,12 +2,12 @@
  * Program IDL in camelCase format in order to be used in JS/TS.
  *
  * Note that this is only a type helper and is not the actual IDL. The original
- * IDL can be found at `target/idl/sol_ship.json`.
+ * IDL can be found at `target/idl/solship.json`.
  */
-export type SolShip = {
+export type Solship = {
   "address": "8ud2dBF8N4f9eZwiWnYZ3TEXEaEvm4QHr6Tu6tYKkJ5T",
   "metadata": {
-    "name": "solShip",
+    "name": "solship",
     "version": "0.1.0",
     "spec": "0.1.0",
     "description": "Created with Anchor"
@@ -124,6 +124,10 @@ export type SolShip = {
           "signer": true
         },
         {
+          "name": "sessionKey",
+          "signer": true
+        },
+        {
           "name": "queue",
           "writable": true,
           "pda": {
@@ -220,11 +224,29 @@ export type SolShip = {
       "accounts": [
         {
           "name": "queue",
-          "writable": true
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  113,
+                  117,
+                  101,
+                  117,
+                  101
+                ]
+              }
+            ]
+          }
         },
         {
           "name": "player",
           "writable": true,
+          "signer": true
+        },
+        {
+          "name": "sessionKey",
           "signer": true
         },
         {
@@ -474,6 +496,14 @@ export type SolShip = {
             "type": "pubkey"
           },
           {
+            "name": "player1SessionKey",
+            "type": "pubkey"
+          },
+          {
+            "name": "player2SessionKey",
+            "type": "pubkey"
+          },
+          {
             "name": "player1BoardHash",
             "type": {
               "array": [
@@ -588,6 +618,10 @@ export type SolShip = {
             "type": "pubkey"
           },
           {
+            "name": "sessionKey",
+            "type": "pubkey"
+          },
+          {
             "name": "boardRoot",
             "type": {
               "array": [
@@ -647,6 +681,10 @@ export type SolShip = {
           {
             "name": "attackedField",
             "type": "u8"
+          },
+          {
+            "name": "shipPlaced",
+            "type": "bool"
           }
         ]
       }

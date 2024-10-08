@@ -1,7 +1,7 @@
 {
   "address": "8ud2dBF8N4f9eZwiWnYZ3TEXEaEvm4QHr6Tu6tYKkJ5T",
   "metadata": {
-    "name": "sol_ship",
+    "name": "solship",
     "version": "0.1.0",
     "spec": "0.1.0",
     "description": "Created with Anchor"
@@ -118,6 +118,10 @@
           "signer": true
         },
         {
+          "name": "session_key",
+          "signer": true
+        },
+        {
           "name": "queue",
           "writable": true,
           "pda": {
@@ -214,11 +218,29 @@
       "accounts": [
         {
           "name": "queue",
-          "writable": true
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  113,
+                  117,
+                  101,
+                  117,
+                  101
+                ]
+              }
+            ]
+          }
         },
         {
           "name": "player",
           "writable": true,
+          "signer": true
+        },
+        {
+          "name": "session_key",
           "signer": true
         },
         {
@@ -468,6 +490,14 @@
             "type": "pubkey"
           },
           {
+            "name": "player1_session_key",
+            "type": "pubkey"
+          },
+          {
+            "name": "player2_session_key",
+            "type": "pubkey"
+          },
+          {
             "name": "player1_board_hash",
             "type": {
               "array": [
@@ -582,6 +612,10 @@
             "type": "pubkey"
           },
           {
+            "name": "session_key",
+            "type": "pubkey"
+          },
+          {
             "name": "board_root",
             "type": {
               "array": [
@@ -641,6 +675,10 @@
           {
             "name": "attacked_field",
             "type": "u8"
+          },
+          {
+            "name": "ship_placed",
+            "type": "bool"
           }
         ]
       }

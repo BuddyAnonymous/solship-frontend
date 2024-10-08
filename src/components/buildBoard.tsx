@@ -4,11 +4,13 @@ import Ship from './Ship';
 import EnemyBoard from './EnemyBoard.tsx';
 import '../styles/buildBoard.css';
 import { constructMerkleTree, printMerkleTree, MerkleNode } from '../merkleTree/merkleTree.ts';
-import { GameEvent, program } from '../anchor/setup.ts';
+import { GameEvent, program, sessionProgram } from '../anchor/setup.ts';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
-import { Enum, PublicKey, SystemProgram } from '@solana/web3.js';
+import { Enum, LAMPORTS_PER_SOL, PublicKey, sendAndConfirmTransaction, SystemProgram } from '@solana/web3.js';
 import Timer from './Timer';
 import { ComputeBudgetProgram } from '@solana/web3.js';
+import { Keypair } from '@solana/web3.js';
+import { sessionKey } from '../anchor/setup.ts';
 import { set } from '@coral-xyz/anchor/dist/cjs/utils/features';
 
 enum GameWinner {
@@ -45,23 +47,29 @@ function BuildBoard() {
 	const [turn, setTurn] = useState(1);
 	const [enemyShips, setEnemyShips] = useState(Array(10).fill(null).map(() => Array(10).fill(false)));
 	const [gameWinner, setGameWinner] = useState(GameWinner.NONE);
+	const [secrets, setSecrets] = useState<number[][] | null>(null);
+	const [enemyRemainingShipFields, setEnemyRemainingShipFields] = useState(17);
 
 	const isSubscribed = useRef(false);
 
 	useEffect(() => {
-		setGameWinner(GameWinner.WINNER);
-
-		const fetchGameTest = async () => {
-			const gameTest = await program.account.game.all();
-			console.log(gameTest);
+		const checkWin = async () => {
+			console.log("Enemy remaining ship fields: ", enemyRemainingShipFields);
+			if (enemyRemainingShipFields === 0) await claimWin();
 		};
-		fetchGameTest();
+		checkWin();
+	}, [enemyRemainingShipFields]);
+
+	useEffect(() => {
+		// const fetchGameTest = async () => {
+		// 	const gameTest = await program.account.game.all();
+		// 	console.log(gameTest);
+		// };
+		// fetchGameTest();
 
 		if (isSubscribed.current) return;
 
 		const subId1 = program.addEventListener('gameStarted', (gameStarted) => {
-			console.log("Game started: ", gameStarted);
-
 			const selfPublicKey = publicKey;
 			console.log("Self public key: ", selfPublicKey);
 			if (gameStarted.player1.toBase58() !== selfPublicKey?.toBase58() && gameStarted.player2.toBase58() !== selfPublicKey?.toBase58()) return;
@@ -76,17 +84,19 @@ function BuildBoard() {
 			setTimerRunning(true);
 
 			setGame(gameStarted);
+			console.log("Game started: ", gameStarted);
 		});
 
 		const subId2 = program.addEventListener('turnFinished', (turnFinished) => {
-			console.log("Turn finished", turnFinished);
-
+			if (game == null) return;
 			if (turnFinished.game.toBase58() !== game?.game.toBase58()) return;
 
 			setTurn((prev) => prev + 1);
+			console.log("Turn finished", turnFinished);
 		});
 
 		const subId3 = program.addEventListener('fieldAttacked', (fieldAttacked) => {
+			if (game == null) return;
 			(async () => {
 				// ignore if not the current game
 				if (fieldAttacked.game.toBase58() !== game?.game.toBase58()) return;
@@ -108,9 +118,9 @@ function BuildBoard() {
 
 				const [row, col] = indexToCoords(attackedField);
 				console.log("Sending proof: ", { index: attackedField, ship_placed: table[row][col] });
-				const tx = await program.methods.verifyProof(proof, { index: attackedField, shipPlaced: table[row][col] })
+				const tx = await sessionProgram.methods.verifyProof(proof, { index: attackedField, shipPlaced: table[row][col]})
 					.accounts({
-						player: publicKey!,
+						player: sessionKey!.publicKey,
 						game: game?.game,
 					})
 					.preInstructions([
@@ -118,43 +128,61 @@ function BuildBoard() {
 							units: 1_400_000
 						})
 					])
-					.transaction();
+					.signers([sessionKey!])
+					.rpc()
 
-				try {
-					const txSignature = await sendTransaction(
-						tx,
-						connection,
-						{
-							skipPreflight: true,
-						}
-					);
-					console.log("Transaction sent: ", txSignature);
-				} catch (error) {
-					console.error("Transaction error", error);
-				}
+				// const tx = await program.methods.verifyProof(proof, { index: attackedField, shipPlaced: table[row][col] })
+				// 	.accounts({
+				// 		player: publicKey!,
+				// 		game: game?.game,
+				// 	})
+				// 	.preInstructions([
+				// 		ComputeBudgetProgram.setComputeUnitLimit({
+				// 			units: 1_400_000
+				// 		})
+				// 	])
+				// 	.transaction();
+
+				// try {
+				// 	const txSignature = await sendTransaction(
+				// 		tx,
+				// 		connection,
+				// 		{
+				// 			skipPreflight: true,
+				// 		}
+				// 	);
+				// 	console.log("Transaction sent: ", txSignature);
+				// } catch (error) {
+				// 	console.error("Transaction error", error);
+				// }
 
 				console.log("Field attacked: ", fieldAttacked);
 			})();
 		});
 
 		const subId4 = program.addEventListener('proofVerified', (proofVerified) => {
-			console.log("Proof verified: ", proofVerified);
-
-			if (proofVerified.game.toBase58() !== game?.game.toBase58()) return;
+			if (game == null) return;
+			if (proofVerified.game.toBase58() !== game!?.game.toBase58()) return;
 
 			if (proofVerified.player.toBase58() !== enemy?.toBase58()) return;
 
-			if (proofVerified.shipPlaced == true) {
+			if (proofVerified.shipPlaced === true) {
+				setEnemyRemainingShipFields((prev) => prev - 1);
+
 				setEnemyShips((prev) => {
 					const [row, col] = indexToCoords(proofVerified.attackedField);
 					const newEnemyShips = [...prev];
 					newEnemyShips[row][col] = true;
+					console.log("Enemy ships: ", newEnemyShips);
 					return newEnemyShips;
 				});
 			}
+
+			console.log("Proof verified: ", proofVerified);
 		});
 
 		const subId5 = program.addEventListener('gameFinished', (gameFinished) => {
+			if (game == null) return;
 			console.log("Game finished", gameFinished);
 
 			if (gameFinished.game.toBase58() !== game?.game.toBase58()) return;
@@ -183,9 +211,47 @@ function BuildBoard() {
 		// };
 	}, [game]);
 
-	const handleTimeUp = () => {
-		// claimWin();
+	const handleTimeUp = async () => {
+		// await claimWin();
 	};
+
+	async function claimWin() {
+		// Create an array with 28 padding leaves
+		const paddingLeaves = Array(28).fill(null).map((_, index) => {
+			// const ind = index + 100;
+			// const row = Math.floor(ind / 10);
+			// const col = ind % 10;
+
+			return {
+			  shipPlaced: false,
+			//   secret: new anchor.BN(0),
+			};
+		  });
+
+		const claimWinParam = table.flat().map((cell, index) => {
+			return ({ shipPlaced: cell });
+		}).concat(paddingLeaves);
+
+		try {
+			const tx = await sessionProgram.methods.claimWin(claimWinParam)
+				.accountsStrict({
+					game: game!.game,
+					player: sessionKey.publicKey,
+				})
+				.preInstructions([
+					ComputeBudgetProgram.setComputeUnitLimit({
+						units: 1_400_000
+					})
+				])
+				.signers([sessionKey])
+				.rpc({
+					skipPreflight: true,
+				})
+		}
+		catch (err) {
+			console.log(err);
+		}
+	}
 
 	function generateProof(fieldIndex: number) {
 		// const _merkleRoot: MerkleNode = constructMerkleTree(table)
@@ -219,15 +285,16 @@ function BuildBoard() {
 			return Array.from(buffer)
 		})
 
-		console.log("Proof: ", proofAsByteArrays);
-		console.log("Temp proof: ", tempProof);
+		// console.log("Proof: ", proofAsByteArrays);
+		console.log("Proof array: ", tempProof);
 
 		return proofAsByteArrays;
 
 	}
 
 	const handleReadyClick = async () => {
-		const _merkleRoot: MerkleNode = await constructMerkleTree(table);
+		const [_merkleRoot, _secrets] = await constructMerkleTree(table);
+		setSecrets(_secrets);
 		setMerkleRoot(_merkleRoot);
 		setIsReady(true);
 		printMerkleTree(_merkleRoot);
@@ -237,13 +304,27 @@ function BuildBoard() {
 		if (queue && queue.account.players.length == 0) {
 			console.log("Joining queue: ", program);
 			const tx = await program.methods.joinQueue(hexStringToByteArray(_merkleRoot.hash))
-				.accounts({
+				.accountsStrict({
 					queue: queue.publicKey,
 					player: publicKey!,
-					// systemProgram: SystemProgram.programId,
+					sessionKey: sessionKey!.publicKey,
+					systemProgram: SystemProgram.programId,
 				})
+				.preInstructions([
+					SystemProgram.transfer({
+						fromPubkey: publicKey!,
+						toPubkey: sessionKey!.publicKey,
+						lamports: 500 * LAMPORTS_PER_SOL,
+					})
+				])
+				// .signers([sessionKey!])
 				.transaction();
 			try {
+				let blockhash = (await connection.getLatestBlockhash('finalized')).blockhash;
+				tx.recentBlockhash = blockhash;
+				tx.feePayer = publicKey!;
+				tx.partialSign(sessionKey!);
+
 				// Perform the Solana transaction
 				const txSignature = await sendTransaction(
 					tx,
@@ -258,16 +339,29 @@ function BuildBoard() {
 			}
 		} else if (queue) {
 			const enemy = queue.account.players[0];
-			console.log("enemy: ", enemy);
 			const [gameAddr] = PublicKey.findProgramAddressSync([Buffer.from("game"), publicKey!.toBuffer(), new PublicKey(enemy.address).toBuffer()], program.programId);
 			const tx = await program.methods.createGame(enemy.address, hexStringToByteArray(_merkleRoot.hash))
 				.accounts({
 					// game: gameAddr,
 					player: publicKey!,
+					sessionKey: sessionKey!.publicKey,
 					// queue: queue.publicKey,
 				})
+				.preInstructions([
+					SystemProgram.transfer({
+						fromPubkey: publicKey!,
+						toPubkey: sessionKey!.publicKey,
+						lamports: 500 * LAMPORTS_PER_SOL,
+					})
+				])
+				// .signers([sessionKey!])
 				.transaction();
 			try {
+				let blockhash = (await connection.getLatestBlockhash('finalized')).blockhash;
+				tx.recentBlockhash = blockhash;
+				tx.feePayer = publicKey!;
+				tx.partialSign(sessionKey!);
+				
 				const txSignature = await sendTransaction(
 					tx,
 					connection,
@@ -284,7 +378,6 @@ function BuildBoard() {
 
 	async function handleAttackClick() {
 		const fieldIndex = parseInt(target.split("-")[0]);
-		console.log(fieldIndex);
 
 		if (target !== null) {
 			setAttackedFields(prev => [...prev, parseInt(target.split("-")[0])]);
@@ -299,24 +392,34 @@ function BuildBoard() {
 		}
 
 		if (target !== null) {
-			const tx = await program.methods.attack(fieldIndex)
+			const tx = await sessionProgram.methods.attack(fieldIndex)
 				.accounts({
 					game: game!.game,
-					player: publicKey!,
+					player: sessionKey!.publicKey,
 				})
-				.transaction();
-			try {
-				const txSignature = await sendTransaction(
-					tx,
-					connection,
-					{
-						skipPreflight: true,
-					}
-				);
-				console.log("Transaction sent: ", txSignature);
-			} catch (error) {
-				console.error("Transaction error", error);
-			}
+				.signers([sessionKey!])
+				.rpc({
+					skipPreflight: true,
+				});
+
+			// const tx = await program.methods.attack(fieldIndex)
+			// 	.accounts({
+			// 		game: game!.game,
+			// 		player: publicKey!,
+			// 	})
+			// 	.transaction();
+			// try {
+			// 	const txSignature = await sendTransaction(
+			// 		tx,
+			// 		connection,
+			// 		{
+			// 			skipPreflight: true,
+			// 		}
+			// 	);
+			// 	console.log("Transaction sent: ", txSignature);
+			// } catch (error) {
+			// 	console.error("Transaction error", error);
+			// }
 		}
 
 		setTarget(null);
@@ -353,7 +456,7 @@ function BuildBoard() {
 			case GameWinner.LOSER:
 				return <h1 style={{ color: 'red', textShadow: '2px 2px 5px rgba(255,255,255,0.15)', fontSize: '80px', marginBottom: '20px' }}>YOU LOST!</h1>;
 			case GameWinner.DRAW:
-				return <h1 style={{ color: 'yellow', textShadow: '2px 2px 5px rgba(255,255,255,0.15)', fontSize: '80px', marginBottom: '20px'}}>DRAW!</h1>;
+				return <h1 style={{ color: 'yellow', textShadow: '2px 2px 5px rgba(255,255,255,0.15)', fontSize: '80px', marginBottom: '20px' }}>DRAW!</h1>;
 			default:
 				return (<div>
 					<h2 style={{ color: 'teal', textShadow: '2px 2px 5px rgba(255,255,255,0.15)' }}>Turn: {turn}</h2>
