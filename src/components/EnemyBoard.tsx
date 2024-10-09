@@ -16,6 +16,12 @@ function EnemyBoard({ target, setTarget, attackedFields, enemyShips }: { target:
             e.target.className = "enemy-square-clicked"
         }
     }
+    function checkClassName(rowIndex,colIndex){
+        if(attackedFields.includes(rowIndex*10 + colIndex)){
+            return "enemy-board-square-attacked"
+        }
+        return "enemy-board-square"
+    }
     const rows = Array.from({ length: 10 }, (_, rowIndex) =>
         Array.from({ length: 10 }, (_, colIndex) => (
             <div

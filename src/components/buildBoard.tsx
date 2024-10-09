@@ -384,13 +384,6 @@ function BuildBoard() {
 		}
 
 		setTarget(null);
-		for (let i = 0; i < 100; i++) {
-			const element = document.getElementById(i + "-enemy");
-			if (element && element.className === "enemy-square-clicked") {
-				element.className = "enemy-board-square";
-			}
-		}
-
 		if (target !== null) {
 			const tx = await sessionProgram.methods.attack(fieldIndex)
 				.accounts({
@@ -424,9 +417,6 @@ function BuildBoard() {
 
 		setTarget(null);
 		// setTurn(turn + 1);
-		for (let i = 0; i < 100; i++) {
-			document.getElementById(i + "-enemy").className = "enemy-board-square"
-		}
 	}
 
 	function hexStringToByteArray(hexString: string): number[] {
