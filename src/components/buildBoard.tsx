@@ -49,6 +49,7 @@ function BuildBoard() {
 	const [gameWinner, setGameWinner] = useState(GameWinner.NONE);
 	const [secrets, setSecrets] = useState<number[][] | null>(null);
 	const [enemyRemainingShipFields, setEnemyRemainingShipFields] = useState(17);
+	const [isInQueue, setInQueue] = useState(true);
 
 	const isSubscribed = useRef(false);
 
@@ -298,6 +299,7 @@ function BuildBoard() {
 		setMerkleRoot(_merkleRoot);
 		setIsReady(true);
 		printMerkleTree(_merkleRoot);
+		setInQueue(true);
 
 		const queue = (await program.account.queue.all()).at(0);
 		console.log(queue);
@@ -375,6 +377,11 @@ function BuildBoard() {
 			}
 		}
 	};
+
+	const handleLeaveQueue = async () => {
+		setInQueue(false);
+		setIsReady(false);
+	}
 
 	async function handleAttackClick() {
 		const fieldIndex = parseInt(target.split("-")[0]);
@@ -458,7 +465,29 @@ function BuildBoard() {
 
 	return (
 		isReady ? (
+			isInQueue ? (
 			<div style={{ marginBottom: '100px' }}>
+				{isInQueue ? null : <div style={{ marginRight: '200px' }}>
+					{renderGameState(gameWinner)}
+				</div>}
+				<div className="game-container">
+					<div className="board-container">
+						<Board table={table} dragging={false} validSquares={validSquares} isReady={isReady} setTable={setTable} setValidSquares={setValidSquares} fieldsEnemyAttacked={fieldsEnemyAttacked} />
+					</div>
+					{isInQueue ? <div style={{ }}>
+					<p style={{color : "white", fontSize: "40px", textShadow: "5px 5px 12px rgba(100, 23, 235, 0.5)"}}>LOOKING FOR AN OPPONENT...</p>
+					<button className="ready-button" onClick={handleLeaveQueue}>LEAVE QUEUE</button>
+				</div> : <div>
+						<div className="board-container">
+							<EnemyBoard target={target} setTarget={setTarget} merkleRoot={merkleRoot} attackedFields={attackedFields} enemyShips={enemyShips} />
+						</div>
+						<div className={target != null ? "attack-button" : "attack-button-locked"} onClick={target != null ? handleAttackClick : null}>ATTACK</div>
+					</div>}
+				</div>
+			</div>
+
+			) : (
+				<div style={{ marginBottom: '100px' }}>
 				<div style={{ marginRight: '200px' }}>
 					{renderGameState(gameWinner)}
 				</div>
@@ -466,12 +495,13 @@ function BuildBoard() {
 					<div className="board-container">
 						<Board table={table} dragging={false} validSquares={validSquares} isReady={isReady} setTable={setTable} setValidSquares={setValidSquares} fieldsEnemyAttacked={fieldsEnemyAttacked} />
 					</div>
-					<div className="board-container">
-						<EnemyBoard target={target} setTarget={setTarget} merkleRoot={merkleRoot} attackedFields={attackedFields} enemyShips={enemyShips} />
-					</div>
-					<div className={target != null ? "attack-button" : "attack-button-locked"} onClick={target != null ? handleAttackClick : null}>ATTACK</div>
+						<div className="board-container">
+							<EnemyBoard target={target} setTarget={setTarget} merkleRoot={merkleRoot} attackedFields={attackedFields} enemyShips={enemyShips} />
+						</div>
+						<div className={target != null ? "attack-button" : "attack-button-locked"} onClick={target != null ? handleAttackClick : null}>ATTACK</div>
 				</div>
 			</div>
+			)
 		) : (
 			<div className="build-board-container">
 				<div className="sidebar">
