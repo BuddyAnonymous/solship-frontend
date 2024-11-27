@@ -1,0 +1,49 @@
+.navbar {
+    display: flex;
+    justify-content: center; /* Center the content horizontally */
+    align-items: center;
+    background-color: #1e3a8a; /* Change to a blue color */
+    padding: 1.5rem 3rem; /* Increase padding for a larger navbar */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: fixed; /* Make the navbar fixed at the top */
+    top: 0;
+    width: 100%;
+    z-index: 1000; /* Ensure the navbar is above other elements */
+  }
+  
+  .navbar-logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    position: absolute;
+    left: 2rem; /* Position the logo on the left */
+  }
+  
+  .navbar-list {
+    list-style: none;
+    display: flex;
+    gap: 4rem; /* Increase the gap between items */
+    margin: 0;
+    padding: 0;
+  }
+  
+  .navbar-item {
+    margin: 0;
+  }
+  
+  .navbar-link {
+    color: white;
+    text-decoration: none;
+    font-size: 1.2rem;
+    transition: color 0.3s ease;
+  }
+  
+  .navbar-link:hover {
+    color: #ff6161;
+    text-decoration: underline;
+  }
+  
+  .navbar-wallet {
+    position: absolute;
+    right: 2rem; /* Position the wallet button on the right */
+    padding: 0.5rem; /* Add padding around the wallet button */
+  }

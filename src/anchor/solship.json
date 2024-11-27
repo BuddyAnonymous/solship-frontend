@@ -1,5 +1,5 @@
 {
-  "address": "8ud2dBF8N4f9eZwiWnYZ3TEXEaEvm4QHr6Tu6tYKkJ5T",
+  "address": "4W4poS8L7BWYuaQWteMBNUzzvux1oNN2Jc1u2nqKYMeE",
   "metadata": {
     "name": "solship",
     "version": "0.1.0",
@@ -51,11 +51,94 @@
       "accounts": [
         {
           "name": "player",
+          "writable": true,
           "signer": true
         },
         {
           "name": "game",
           "writable": true
+        },
+        {
+          "name": "queue",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  113,
+                  117,
+                  101,
+                  117,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "player_stats_1",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  108,
+                  97,
+                  121,
+                  101,
+                  114,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "game.player1",
+                "account": "Game"
+              }
+            ]
+          }
+        },
+        {
+          "name": "player_stats_2",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  108,
+                  97,
+                  121,
+                  101,
+                  114,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "game.player2",
+                "account": "Game"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
         }
       ],
       "args": [
@@ -68,7 +151,16 @@
                   "name": "ProofField"
                 }
               },
-              128
+              100
+            ]
+          }
+        },
+        {
+          "name": "secrets",
+          "type": {
+            "array": [
+              "u32",
+              100
             ]
           }
         }
@@ -140,6 +232,35 @@
           }
         },
         {
+          "name": "player_stats",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  108,
+                  97,
+                  121,
+                  101,
+                  114,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "player"
+              }
+            ]
+          }
+        },
+        {
           "name": "system_program",
           "address": "11111111111111111111111111111111"
         }
@@ -159,6 +280,82 @@
           }
         }
       ]
+    },
+    {
+      "name": "exit_queue",
+      "discriminator": [
+        43,
+        13,
+        33,
+        182,
+        67,
+        205,
+        232,
+        148
+      ],
+      "accounts": [
+        {
+          "name": "queue",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  113,
+                  117,
+                  101,
+                  117,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "player",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "session_key",
+          "signer": true
+        },
+        {
+          "name": "player_stats",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  108,
+                  97,
+                  121,
+                  101,
+                  114,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "player"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
     },
     {
       "name": "initialize_queue",
@@ -244,6 +441,35 @@
           "signer": true
         },
         {
+          "name": "player_stats",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  108,
+                  97,
+                  121,
+                  101,
+                  114,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "player"
+              }
+            ]
+          }
+        },
+        {
           "name": "system_program",
           "address": "11111111111111111111111111111111"
         }
@@ -320,6 +546,19 @@
         100,
         121,
         18
+      ]
+    },
+    {
+      "name": "PlayerStats",
+      "discriminator": [
+        169,
+        146,
+        242,
+        176,
+        102,
+        118,
+        231,
+        172
       ]
     },
     {
@@ -453,6 +692,11 @@
       "code": 6009,
       "name": "AlreadyAttackedThisTurn",
       "msg": "Player already attacked this turn"
+    },
+    {
+      "code": 6010,
+      "name": "WrongSeeds",
+      "msg": "Wrong seeds"
     }
   ],
   "types": [
@@ -582,6 +826,10 @@
           {
             "name": "ship_placed",
             "type": "bool"
+          },
+          {
+            "name": "secret32",
+            "type": "u32"
           }
         ]
       }
@@ -643,6 +891,22 @@
           {
             "name": "player2",
             "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PlayerStats",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "wins",
+            "type": "u32"
+          },
+          {
+            "name": "losses",
+            "type": "u32"
           }
         ]
       }

@@ -3,9 +3,23 @@ import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
 import { Solship } from "./solship.ts";
 import IDL from "./solship.json";
 import { Connection, Keypair, PublicKey } from "@solana/web3.js";
+import { sha256 } from "js-sha256";
 
 const connection = new Connection("http://127.0.0.1:8899", "confirmed");
-export const sessionKey = Keypair.generate();
+// export const sessionKey = Keypair.generate();
+// console.log("Session key test:", sessionKey)
+let seed = localStorage.getItem("seed");
+if (!seed) {
+  // If the seed doesn't exist, set it in local storage
+  seed = "fixed_seed_string";
+  localStorage.setItem("seed", seed);
+}
+
+const seedHash = sha256.array(seed).slice(0, 32);
+const seedUint8Array = new Uint8Array(seedHash);
+export const sessionKey = Keypair.fromSeed(seedUint8Array);
+console.log("Session key test:", sessionKey.publicKey.toString())
+
 
 // Initialize the program interface with the IDL, program ID, and connection.
 // This setup allows us to interact with the on-chain program using the defined interface.

@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+import Navbar from './components/Navbar';
 import BuildBoard from './components/buildBoard';
+import Scoreboard from './components/Scoreboard';
 import { useMemo } from "react";
 import {
 	ConnectionProvider,
@@ -14,8 +16,10 @@ import { clusterApiUrl } from "@solana/web3.js";
 import "./App.css";
 import "./styles/wallet.css";
 
+
 // Default styles that can be overridden by your app
 import "@solana/wallet-adapter-react-ui/styles.css";
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 function App() {
 	const [play, setPlay] = useState(false);
@@ -34,21 +38,27 @@ function App() {
 		<ConnectionProvider endpoint={endpoint}>
 			<WalletProvider wallets={[]} autoConnect>
 				<WalletModalProvider>
-					<div className="App">
-						<div className="wallet-button-container">
-							<WalletMultiButton />
+					<Router>
+						<Navbar />
+						{/* <div className="wallet-button-container">
+								<WalletMultiButton />
+							</div> */}
+						<div className="App">
+							<Routes>
+								<Route path="/" element={!play ? (
+									<div className="landing-page">
+										<h1 className="title">Battleship</h1>
+										<button className="play-button" onClick={handlePlayClick}>
+											PLAY
+										</button>
+									</div>
+								) : (
+									<BuildBoard setPlay={setPlay}/>
+								)} />
+								<Route path="/scoreboard" element={<Scoreboard />} />
+							</Routes>
 						</div>
-						{!play ? (
-							<div className="landing-page">
-								<h1 className="title">Battleship</h1>
-								<button className="play-button" onClick={handlePlayClick}>
-									PLAY
-								</button>
-							</div>
-						) : (
-							<BuildBoard />
-						)}
-					</div>
+					</Router>
 				</WalletModalProvider>
 			</WalletProvider>
 		</ConnectionProvider>

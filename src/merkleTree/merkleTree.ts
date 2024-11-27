@@ -1,6 +1,7 @@
 import { createHash } from 'crypto-browserify';
 import { SeededRNG } from "./seededRng";
 import { blake3 } from "hash-wasm";
+import * as anchor from "@coral-xyz/anchor";
 
 const rng = new SeededRNG(12345); // Example seed, ensure to use the same seed across both files for consistency
 
@@ -9,7 +10,8 @@ export type MerkleNode = {
     left?: MerkleNode;
     right?: MerkleNode;
     data?: boolean; // Assuming the cell state is a boolean
-    secret?: bigint; // u64 secret for each cell
+    // secret?: anchor.BN; // u64 secret for each cell
+    secret?: number; // u32 secret for each cell
     fieldIndex?: number; // Index of the field in the board
 };
 
@@ -27,12 +29,16 @@ export async function constructMerkleTree(board: boolean[][]): Promise<[MerkleNo
     let secrets: number[][] = Array.from({ length: 10 }, () => Array(10).fill(0));
     let nodes: MerkleNode[] = await Promise.all(board.flat().map(async (cell, index) => {
         // Generate or assign a unique u64 secret for each cell
-        const secret = BigInt(Math.floor(rng.random() * Number.MAX_SAFE_INTEGER));
-        const buffer = new Uint8Array(2); // 1 byte for index, 1 byte for shipPlaced, 8 bytes for secret
+        // const secret = new anchor.BN(Math.floor(rng.random() * 0xFFFFFFFF));
+        const secret = Math.floor(rng.random() * 0xFFFFFFFF);
+        const buffer = new Uint8Array(6); // 1 byte for index, 1 byte for shipPlaced, 4 bytes for secret
         buffer[0] = index; // First byte for index (0-255)
         buffer[1] = cell ? 1 : 0; // Second byte for shipPlaced (boolean to 0 or 1)
+        const secretBytes = new DataView(new ArrayBuffer(4));
+        secretBytes.setUint32(0, secret, true); // true for little-endian
+        buffer.set(new Uint8Array(secretBytes.buffer), 2); // Set the secret bytes starting at index 2
         // const secretBytes = new DataView(new ArrayBuffer(8));
-        // secretBytes.setBigUint64(0, secret, true); // true for little-endian
+        // secretBytes.setBigUint64(0, BigInt(secret.toString()), true); // true for little-endian
 
         // buffer.set(new Uint8Array(secretBytes.buffer), 2); // Set the secret bytes starting at index 2
         const h = await blake3(buffer);
@@ -50,10 +56,10 @@ export async function constructMerkleTree(board: boolean[][]): Promise<[MerkleNo
 
     // Add default nodes to make the total count a power of 2
     while (nodes.length < nextPowerOf2) {
-        const buffer = new Uint8Array(2)
-        buffer[0] = nodes.length;
+        const buffer = new Uint8Array(6);
+        buffer[0] = nodes.length
         buffer[1] = 0;
-        nodes.push({ hash: await blake3(buffer), data: undefined, secret: 0n });
+        nodes.push({ hash: await blake3(buffer), data: undefined, secret: 0, fieldIndex: nodes.length });
     }
 
     while (nodes.length > 1) {

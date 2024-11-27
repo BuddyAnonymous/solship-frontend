@@ -1,0 +1,42 @@
+.scoreboard {
+    text-align: center;
+    color: white;
+    margin-top: 80px; /* Adjust this value as needed to move the h1 closer to the navbar */
+  }
+  
+  .scoreboard h1 {
+    font-size: 3rem; /* Increase the font size of the h1 */
+    margin-bottom: 20px; /* Add some space below the h1 */
+  }
+  
+  .scoreboard table {
+    margin: 0 auto;
+    border-collapse: collapse;
+    width: 90%; /* Increase the width of the table */
+    font-size: 1.2rem; /* Increase the font size */
+    font-family: 'Arial', sans-serif; /* Change the font */
+  }
+  
+  .scoreboard th, .scoreboard td {
+    border: 1px solid #ddd;
+    padding: 12px; /* Increase padding for better readability */
+  }
+  
+  .scoreboard th {
+    background-color: #1e3a8a; /* Change to a blue color */
+    color: white;
+  }
+  
+  .scoreboard tr:nth-child(even) {
+    background-color: #2e2e2e; /* Change to a darker gray color */
+    color: white; /* Ensure text color is readable on dark background */
+  }
+  
+  .scoreboard tr:nth-child(odd) {
+    background-color: #f2f2f2;
+    color: black; /* Ensure text color is readable on light background */
+  }
+  
+  .scoreboard tr:hover {
+    background-color: #ddd;
+  }

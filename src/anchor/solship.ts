@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/solship.json`.
  */
 export type Solship = {
-  "address": "8ud2dBF8N4f9eZwiWnYZ3TEXEaEvm4QHr6Tu6tYKkJ5T",
+  "address": "4W4poS8L7BWYuaQWteMBNUzzvux1oNN2Jc1u2nqKYMeE",
   "metadata": {
     "name": "solship",
     "version": "0.1.0",
@@ -57,11 +57,94 @@ export type Solship = {
       "accounts": [
         {
           "name": "player",
+          "writable": true,
           "signer": true
         },
         {
           "name": "game",
           "writable": true
+        },
+        {
+          "name": "queue",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  113,
+                  117,
+                  101,
+                  117,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "playerStats1",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  108,
+                  97,
+                  121,
+                  101,
+                  114,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "game.player1",
+                "account": "game"
+              }
+            ]
+          }
+        },
+        {
+          "name": "playerStats2",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  108,
+                  97,
+                  121,
+                  101,
+                  114,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "game.player2",
+                "account": "game"
+              }
+            ]
+          }
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
         }
       ],
       "args": [
@@ -74,7 +157,16 @@ export type Solship = {
                   "name": "proofField"
                 }
               },
-              128
+              100
+            ]
+          }
+        },
+        {
+          "name": "secrets",
+          "type": {
+            "array": [
+              "u32",
+              100
             ]
           }
         }
@@ -146,6 +238,35 @@ export type Solship = {
           }
         },
         {
+          "name": "playerStats",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  108,
+                  97,
+                  121,
+                  101,
+                  114,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "player"
+              }
+            ]
+          }
+        },
+        {
           "name": "systemProgram",
           "address": "11111111111111111111111111111111"
         }
@@ -165,6 +286,82 @@ export type Solship = {
           }
         }
       ]
+    },
+    {
+      "name": "exitQueue",
+      "discriminator": [
+        43,
+        13,
+        33,
+        182,
+        67,
+        205,
+        232,
+        148
+      ],
+      "accounts": [
+        {
+          "name": "queue",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  113,
+                  117,
+                  101,
+                  117,
+                  101
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "player",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "sessionKey",
+          "signer": true
+        },
+        {
+          "name": "playerStats",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  108,
+                  97,
+                  121,
+                  101,
+                  114,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "player"
+              }
+            ]
+          }
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
     },
     {
       "name": "initializeQueue",
@@ -250,6 +447,35 @@ export type Solship = {
           "signer": true
         },
         {
+          "name": "playerStats",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  108,
+                  97,
+                  121,
+                  101,
+                  114,
+                  95,
+                  115,
+                  116,
+                  97,
+                  116,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "player"
+              }
+            ]
+          }
+        },
+        {
           "name": "systemProgram",
           "address": "11111111111111111111111111111111"
         }
@@ -326,6 +552,19 @@ export type Solship = {
         100,
         121,
         18
+      ]
+    },
+    {
+      "name": "playerStats",
+      "discriminator": [
+        169,
+        146,
+        242,
+        176,
+        102,
+        118,
+        231,
+        172
       ]
     },
     {
@@ -459,6 +698,11 @@ export type Solship = {
       "code": 6009,
       "name": "alreadyAttackedThisTurn",
       "msg": "Player already attacked this turn"
+    },
+    {
+      "code": 6010,
+      "name": "wrongSeeds",
+      "msg": "Wrong seeds"
     }
   ],
   "types": [
@@ -588,6 +832,10 @@ export type Solship = {
           {
             "name": "shipPlaced",
             "type": "bool"
+          },
+          {
+            "name": "secret32",
+            "type": "u32"
           }
         ]
       }
@@ -649,6 +897,22 @@ export type Solship = {
           {
             "name": "player2",
             "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "playerStats",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "wins",
+            "type": "u32"
+          },
+          {
+            "name": "losses",
+            "type": "u32"
           }
         ]
       }
