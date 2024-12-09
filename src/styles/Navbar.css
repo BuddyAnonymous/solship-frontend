@@ -9,6 +9,7 @@
     top: 0;
     width: 100%;
     z-index: 1000; /* Ensure the navbar is above other elements */
+    justify-content: space-evenly;
   }
   
   .navbar-logo {
@@ -22,6 +23,16 @@
     list-style: none;
     display: flex;
     gap: 4rem; /* Increase the gap between items */
+    margin: 0;
+    padding: 0;
+  }
+  
+  .navbar-balance-list{
+    list-style: none;
+    align-items: center;
+    position: absolute;
+    right: 2rem;
+    display: flex;
     margin: 0;
     padding: 0;
   }
@@ -43,7 +54,39 @@
   }
   
   .navbar-wallet {
-    position: absolute;
     right: 2rem; /* Position the wallet button on the right */
     padding: 0.5rem; /* Add padding around the wallet button */
   }
+
+  .navbar-balance {
+    border: #0a1535 2px solid;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 10px;
+    background: #7f9cec;
+    border-radius: 5px;
+    height: 50px;
+    
+}
+
+.balance {
+  font-weight: bold;
+  font-size: 1.3rem;
+}
+
+.bonk-balance-text{
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #0a1535;
+}
+
+.bonk-image{
+  width: 30px;
+}
+
+.bonk-image-div{
+  display: flex;
+  justify-content: center;
+  margin-right: 5px;
+}

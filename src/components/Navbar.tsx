@@ -17,9 +17,18 @@ const Navbar = () => {
           <Link to="/scoreboard" className="navbar-link">Scoreboard</Link>
         </li>
       </ul>
-      <div className="navbar-wallet">
-        <WalletMultiButton />
-      </div>
+      <ul className='navbar-balance-list'>
+        <li className='bonk-image-div'>
+          <img src="/images/bonk.png" alt="" className='bonk-image' />
+        </li>
+        <li className="navbar-balance">
+                  <p className='bonk-balance-text'>Bonk Balance:</p> 
+                  <span className="balance">{3}</span>
+        </li>
+        <li className="navbar-wallet">
+          <WalletMultiButton />
+        </li>
+      </ul>
     </nav>
   );
 };
